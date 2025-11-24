@@ -12,6 +12,7 @@ import BookingConfirmationStep from "@/components/appointments/BookingConfirmati
 import { toast } from "sonner";
 import { APPOINTMENT_TYPES } from "@/lib/utils";
 import { format } from "date-fns/format";
+import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
 
 const AppointmentsPage = () => {
   // state management for the booking process - this could be done with something like Zustand for larger apps
@@ -57,6 +58,36 @@ const AppointmentsPage = () => {
       {
         onSuccess: async (appointment) => {
           setBookedAppointment(appointment);
+
+          try {
+            const emailResponse = await fetch("api/send-appointment-email", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userEmail: appointment.userEmail,
+                doctorName: appointment.doctorName,
+                appointmentDate: format(
+                  new Date(appointment.date),
+                  "EEEE, MMMM dd, yyyy"
+                ),
+                appointmentTime: appointment.time,
+                appointmentType: appointmentType?.name,
+                duration: appointmentType?.duration,
+                price: appointmentType?.price,
+              }),
+            });
+
+            if (!emailResponse.ok) {
+              console.error("Failed to send appointment confirmation email.");
+            }
+          } catch (error) {
+            console.error(
+              "Error sending appointment confirmation email: ",
+              error
+            );
+          }
 
           setShowConfirmationModal(true);
           toast.success("Appointment booked successfully!");
@@ -122,6 +153,22 @@ const AppointmentsPage = () => {
           />
         )}
       </div>
+      {bookedAppointment && (
+        <AppointmentConfirmationModal
+          open={showConfirmationModal}
+          onOpenChange={setShowConfirmationModal}
+          appointmentDetails={{
+            doctorName: bookedAppointment.doctorName,
+            appointmentDate: format(
+              new Date(bookedAppointment.date),
+              "EEEE, MMMM dd, yyyy"
+            ),
+            appointmentTime: bookedAppointment.time,
+            userEmail: bookedAppointment.patientEmail,
+          }}
+        />
+      )}
+
       {/* SHOW EXISTING APPOINTMENTS FOR CURRENT USER*/}
       {userAppointments.length > 0 && (
         <div className='mb-8 max-w-7xl mx-auto px-6 py-8'>
