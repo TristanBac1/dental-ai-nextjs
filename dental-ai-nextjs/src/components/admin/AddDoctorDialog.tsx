@@ -64,7 +64,7 @@ const AddDoctorDialog = ({ isOpen, onClose }: AddDoctorDialogProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
           <DialogTitle>Add New Doctor</DialogTitle>

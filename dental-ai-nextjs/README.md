@@ -7,6 +7,7 @@ Theme: https://tweakcn.com/
 Authentication: https://clerk.com/
 Database: https://neon.com/
 Voice Agent: [vapi.ai](https://vapi.ai/)
+Larger State Management: Zustand
 
 ## Getting Started
 
